@@ -9,10 +9,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Raylib-cs" Version="7.0.2" />
+    <PackageReference Include="Raylib-cs" Version="8.0.0" />
     <PackageReference Include="Silk.NET.OpenGL" Version="2.23.0" />
     <PackageReference Include="Silk.NET.Vulkan" Version="2.23.0" />
     <PackageReference Include="Silk.NET.Windowing" Version="2.23.0" />
+    <PackageReference Include="VelcroPhysics" Version="0.2.2-CI-20210406-134555" />
   </ItemGroup>
 
 </Project>

@@ -7,6 +7,7 @@ public class GameObject
     public GameObject(String _name)
     {
         this.name = _name;
+        Program.AllObjects.Add(this);
     }
 
     public T AddComponent<T>() where T : Actor, new()
@@ -21,7 +22,7 @@ public class GameObject
         components.Add(component);
 
         // Сразу запускаем Start()
-        component.Start();
+        //component.Start();
 
         return component;
     }

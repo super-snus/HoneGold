@@ -12,11 +12,14 @@ class Program
         IPhysics physics = new Physics();
         physics.Init();
 
+        IInput input = new RaylibInput();
+        Input.Initialize(input);
+
         // пока нету редактора тут мы создаём мемемебъекты и типа делаем всяокеамп
         GameObject test = new GameObject("TestObj");
         test.transform.position.Y = 0f;
         test.transform.position.X = 0f;
-        //test.AddComponent<TestComponent>();
+        test.AddComponent<TestComponent>();
 
         Texture mem_texture = new Texture();
         mem_texture.Load("/mnt/data/HoneCS/HoneGold/Core/mem.png");

@@ -8,9 +8,9 @@ public class TestComponent : Actor
 
     public override void Update()
     {
-        if (Input.IsKeyDown(87))
+        if (Input.IsKeyPressed(87))
         {
-            GameObject.transform.position.Y += 0.2f;
+            GameObject.GetComponent<RigitBody2D>().SetVelocity(new System.Numerics.Vector2(0, 5f));
         }
     }
 }

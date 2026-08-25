@@ -22,13 +22,27 @@ public class Physics : IPhysics
         {
             // тут проверяем, если у объекта нету ассоциации в списке с body то создаём ему там всё иначе просто передаём корды на transform и всо
             RigitBody2D rigitBody2D = gameObject.GetComponent<RigitBody2D>();
-            if (rigitBody2D == null) break; // если какахи нет то мы не кушаем её
+            if (rigitBody2D == null) continue; // если какахи нет то мы не кушаем её
             if (bodyMap.ContainsKey(rigitBody2D)) // есть в спыске
             {
-                gameObject.transform.position.X = bodyMap[rigitBody2D].Position.X;
-                gameObject.transform.position.Y = bodyMap[rigitBody2D].Position.Y;
+                Body body = bodyMap[rigitBody2D];
 
-                gameObject.transform.rotation.Z = bodyMap[rigitBody2D].Rotation;
+                //применяем позицию из физики в наш движок для рендера и тд
+                gameObject.transform.position.X = body.Position.X;
+                gameObject.transform.position.Y = body.Position.Y;
+                gameObject.transform.rotation.Z = body.Rotation;
+                
+                if (rigitBody2D._targetVelocity.HasValue)
+                {
+                    //жестоко перезапипиндывавем жозы
+                    body.LinearVelocity = ToPhysics(rigitBody2D._targetVelocity.Value);
+                    rigitBody2D._targetVelocity = null;
+                } else
+                {
+                    //применяем _pendingVelocityDelta из рб объекта
+                    body.LinearVelocity += ToPhysics(rigitBody2D._pendingVelocityDelta);
+                    rigitBody2D._pendingVelocityDelta = new Vector2(0, 0);   
+                }
             } else // нету в списке
             {
                 Body body = BodyFactory.CreateBody(world, ToPhysics(new Vector2(gameObject.transform.position.X, gameObject.transform.position.Y))); // создаём физический мем

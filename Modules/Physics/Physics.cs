@@ -27,11 +27,37 @@ public class Physics : IPhysics
             {
                 Body body = bodyMap[rigitBody2D];
 
+                // тут мы применяем трансформ
+                if (gameObject.transform.RotationChanged)
+                {
+                    Console.WriteLine($"Rotation changed to: {gameObject.transform.rotation}");
+                    body.Rotation = gameObject.transform.rotation.Z;
+                    gameObject.transform.RotationChanged = false;
+                }
+                if (gameObject.transform.PositionChanged)
+                {
+                    body.Position = ToPhysics(new Vector2(gameObject.transform.position.X, gameObject.transform.position.Y));
+                    gameObject.transform.PositionChanged = false;
+                }
+                if (gameObject.transform.SizeChanged)
+                {
+                    body.FixtureList.Clear();
+
+                    FixtureFactory.AttachRectangle(gameObject.transform.scale.X, gameObject.transform.scale.Y, 1f, ToPhysics(new Vector2(0f, 0f)), body);
+
+
+                    // Обязательно пересчитываем массу тела после изменения размера
+                    body.ResetMassData();
+
+                    // Сбрасываем флаг, чтобы не крутить это каждый кадр вхолостую
+                    gameObject.transform.SizeChanged = false;
+                }
+
                 //применяем позицию из физики в наш движок для рендера и тд
-                gameObject.transform.position.X = body.Position.X;
-                gameObject.transform.position.Y = body.Position.Y;
-                gameObject.transform.rotation.Z = body.Rotation;
-                
+                gameObject.transform.position = new Vector3(body.Position.X, body.Position.Y, gameObject.transform.position.Z);
+                gameObject.transform.rotation = new Vector3(gameObject.transform.rotation.X, gameObject.transform.rotation.Y, body.Rotation);
+
+                //тут velocity и тд
                 if (rigitBody2D._targetVelocity.HasValue)
                 {
                     //жестоко перезапипиндывавем жозы

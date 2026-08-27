@@ -36,8 +36,11 @@ class RayLibRender : IRenderer
             x = -x;
             y = -y;
 
-            float width = sprite.width * PPU;
-            float height = sprite.height * PPU;
+            //float width = (sprite.width + gameObject.transform.scale.X) * PPU;
+            //float height = (sprite.height + gameObject.transform.scale.Y) * PPU;
+
+            float width = gameObject.transform.scale.X * PPU; // применяем только трансформ абъекта
+            float height = gameObject.transform.scale.Y * PPU;
 
             Rectangle source = new Rectangle(
                 0,
@@ -54,7 +57,7 @@ class RayLibRender : IRenderer
             );
             Vector2 origin = new Vector2(width/2, height/2);
             //Raylib.DrawTexture(texture.texture, x, y, Color.White);
-            Raylib.DrawTexturePro(texture.texture, source, destination, origin, 0f, Color.White);
+            Raylib.DrawTexturePro(texture.texture, source, destination, origin, (gameObject.transform.rotation.Z * (180f / MathF.PI)), Color.White);
         }
     }
     public override bool WindowShouldClose()

@@ -17,8 +17,7 @@ class Program
 
         // пока нету редактора тут мы создаём мемемебъекты и типа делаем всяокеамп
         GameObject test = new GameObject("TestObj");
-        test.transform.position.Y = 0f;
-        test.transform.position.X = 0f;
+        test.transform.position = new System.Numerics.Vector3(0, 0, 0);
         test.AddComponent<TestComponent>();
 
         Texture mem_texture = new Texture();
@@ -34,12 +33,23 @@ class Program
 
         //тупо крутая платформа для теста мемного
         GameObject mememe = new GameObject("blyatforma");
+        mememe.transform.scale = new System.Numerics.Vector3(100, 1, 1);
         RigitBody2D rbmem = mememe.AddComponent<RigitBody2D>();
         rbmem.BodyType = 0;
-        mememe.transform.position.Y = -3;
+        mememe.transform.position = new System.Numerics.Vector3(0, -3, 0);
         Sprite lol = mememe.AddComponent<Sprite>();
         lol.texture = mem_texture;
         mememe.AddComponent<SpriteRenderer>().sprite = lol;
+
+
+        GameObject mememe2 = new GameObject("blyatforma");
+        mememe2.transform.scale = new System.Numerics.Vector3(1, 3, 1);
+        RigitBody2D rbmem2 = mememe2.AddComponent<RigitBody2D>();
+        rbmem2.BodyType = 0;
+        mememe2.transform.position = new System.Numerics.Vector3(0.6f, -3, 0);
+        Sprite lol2 = mememe2.AddComponent<Sprite>();
+        lol2.texture = mem_texture;
+        mememe2.AddComponent<SpriteRenderer>().sprite = lol2;
         // ah~
 
 

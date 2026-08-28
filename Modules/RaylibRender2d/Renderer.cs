@@ -9,10 +9,10 @@ class RayLibRender : IRenderer
     public override void FrameStart()
     {
         Raylib.BeginDrawing();
+        Raylib.ClearBackground(Color.DarkBlue);
     }
     public override void FrameEnd()
     {   
-        Raylib.ClearBackground(Color.DarkBlue);
         Raylib.EndDrawing();
     }
     public override void Draw(List<GameObject> gameObjects)
@@ -58,6 +58,7 @@ class RayLibRender : IRenderer
             Vector2 origin = new Vector2(width/2, height/2);
             //Raylib.DrawTexture(texture.texture, x, y, Color.White);
             Raylib.DrawTexturePro(texture.texture, source, destination, origin, (gameObject.transform.rotation.Z * (180f / MathF.PI)), Color.White);
+            Raylib.DrawFPS(20, 0);
         }
     }
     public override bool WindowShouldClose()
@@ -68,6 +69,8 @@ class RayLibRender : IRenderer
     public override void InitWindow(int width, int height, string title)
     {
         Raylib.InitWindow(width, height, title);
+
+        //Raylib.SetTargetFPS(60);
 
         camera = new Camera2D();
         camera.Target = new System.Numerics.Vector2(0, 0); // На что смотрит камера в мире

@@ -9,6 +9,10 @@ public class Physics : IPhysics
     private Dictionary<RigitBody2D, Body> bodyMap = new Dictionary<RigitBody2D, Body>();
     Vector2 gravity;
     World world;
+
+    public float _physicsTimeStep = 1f / 60f; // 120 FPS
+    public float _accumulator = 0f;
+
     public override void Init()
     {
         //bodyMap = new Dictionary<RigitBody2D, B2Body>();
@@ -56,7 +60,8 @@ public class Physics : IPhysics
                 //применяем позицию из физики в наш движок для рендера и тд
                 gameObject.transform.position = new Vector3(body.Position.X, body.Position.Y, gameObject.transform.position.Z);
                 gameObject.transform.rotation = new Vector3(gameObject.transform.rotation.X, gameObject.transform.rotation.Y, body.Rotation);
-
+                gameObject.transform.PositionChanged = false;
+                gameObject.transform.RotationChanged = false;
                 //тут velocity и тд
                 if (rigitBody2D._targetVelocity.HasValue)
                 {
@@ -80,8 +85,12 @@ public class Physics : IPhysics
                 bodyMap.Add(rigitBody2D, body);
             }
         }
-
-        world.Step(deltaTime);
+        _accumulator += deltaTime;
+        while (_accumulator >= _physicsTimeStep)
+        {
+            world.Step(_physicsTimeStep);
+            _accumulator -= _physicsTimeStep;
+        }
     }
     private BodyType IntToBodyType(int value)
     {

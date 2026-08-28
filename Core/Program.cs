@@ -74,7 +74,6 @@ class Program
         {
             //Raylib.BeginDrawing();
             renderer.FrameStart(); 
-            physics.Step(AllObjects, renderer.deltaTime());
 
 
             foreach (var Object in AllObjects)
@@ -90,7 +89,7 @@ class Program
             {
                 renderer.Draw(RenderObjects);   
             }
-
+            physics.Step(AllObjects, renderer.deltaTime());
             renderer.FrameEnd();
         }
     }

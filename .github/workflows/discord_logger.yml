@@ -1,4 +1,4 @@
-name: GitHub Discord Logger
+name: Discord Logger
 
 on: [push]
 
@@ -6,65 +6,17 @@ jobs:
   discord-log:
     runs-on: ubuntu-latest
     steps:
-      - name: Send Embed to Discord
+      - name: Send clean log to Discord
         run: |
           AUTHOR="${{ github.actor }}"
-          AVATAR="https://github.com{AUTHOR}.png"
           MESSAGE="${{ github.event.head_commit.message }}"
-          COMMIT_URL="${{ github.event.head_commit.url }}"
+          URL="${{ github.event.head_commit.url }}"
           REPO="${{ github.repository }}"
-          BRANCH="${{ github.ref_name }}"
-          TIMESTAMP="${{ github.event.head_commit.timestamp }}"
           
-          # Считаем количество измененных файлов
-          COUNT_ADDED=$(echo '${{ toJson(github.event.head_commit.added) }}' | jq 'length')
-          COUNT_MODIFIED=$(echo '${{ toJson(github.event.head_commit.modified) }}' | jq 'length')
-          COUNT_REMOVED=$(echo '${{ toJson(github.event.head_commit.removed) }}' | jq 'length')
-
-          # Разделяем сообщение на первую строчку (Заголовок) и остальное описание (Description)
-          # Если описание пустое, останется только заголовок
-          TITLE=$(echo "$MESSAGE" | head -n 1 | jq -aR .)
-          DESC=$(echo "$MESSAGE" | tail -n +2 | jq -aR .)
-
-          # Проверяем, есть ли развернутое описание, и форматируем блок
-          if [ "$DESC" != '""' ] && [ ! -z "$DESC" ]; then
-            DESC_BLOCK="Description:\n\`\`\`\n\${DESC:1:-1}\n\`\`\`\n"
-          else
-            DESC_BLOCK=""
-          fi
-
-          STATS="**Статистика изменений:**\n🟢 Добавлено: \`$COUNT_ADDED\` файлов | 🟡 Изменено: \`$COUNT_MODIFIED\` файлов | 🔴 Удалено: \`$COUNT_REMOVED\` файла"
-
-          # Отправляем сформированный JSON в Discord
+          # Форматируем строгое сообщение (Репозиторий | Автор: Текст коммита | Ссылка)
+          TEXT="📁 **$REPO**\n👤 **$AUTHOR**: \`$MESSAGE\`\n🔗 $URL"
+          
           curl -H "Content-Type: application/json" \
                -X POST \
-               -d '{
-                 "content": null,
-                 "embeds": [
-                   {
-                     "title": '"$TITLE"',
-                     "description": "'"$DESC_BLOCK$STATS"'",
-                     "url": "'"$COMMIT_URL"'",
-                     "color": 3158064,
-                     "fields": [
-                       {
-                         "name": "Repository",
-                         "value": "`'"$REPO"'`",
-                         "inline": true
-                       },
-                       {
-                         "name": "Branch",
-                         "value": "`'"$BRANCH"'`",
-                         "inline": true
-                       }
-                     ],
-                     "author": {
-                       "name": "'"$AUTHOR"'",
-                       "icon_url": "'"$AVATAR"'"
-                     },
-                     "timestamp": "'"$TIMESTAMP"'"
-                   }
-                 ],
-                 "attachments": []
-               }' \
-               ${{ secrets.DISCORD_WEBHOOK }}
+               -d "{\"content\": \"$TEXT\"}" \
+               ${{ secrets.malasolka_ds_webhook }}

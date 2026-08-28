@@ -1,0 +1,22 @@
+name: Discord Logger
+
+on: [push]
+
+jobs:
+  discord-log:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send clean log to Discord
+        run: |
+          AUTHOR="${{ github.actor }}"
+          MESSAGE="${{ github.event.head_commit.message }}"
+          URL="${{ github.event.head_commit.url }}"
+          REPO="${{ github.repository }}"
+          
+          # Форматируем строгое сообщение (Репозиторий | Автор: Текст коммита | Ссылка)
+          TEXT="📁 **$REPO**\n👤 **$AUTHOR**: \`$MESSAGE\`\n🔗 $URL"
+          
+          curl -H "Content-Type: application/json" \
+               -X POST \
+               -d "{\"content\": \"$TEXT\"}" \
+               ${{ secrets.malasolka_ds_webhook }}

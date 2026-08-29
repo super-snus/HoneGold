@@ -4,8 +4,12 @@ class Program
     public static List<GameObject> AllObjects = new List<GameObject>();
 
     public static List<GameObject> RenderObjects = new List<GameObject>();
+
     public static void Main(string[] args)
     {
+        float _physicsTimeStep = 1f / 60f; // 120 FPS
+        float _accumulator = 0f;
+
         IRenderer renderer = new RayLibRender(); // RayLibRender on
         renderer.InitWindow(640, 480, "Hone Engine Test");
 
@@ -83,13 +87,27 @@ class Program
                     component.Update();
                 }
             }
+
+            //здесь вызываем FixedUpdate и физику мемную
+            _accumulator += renderer.deltaTime();
+            while (_accumulator >= _physicsTimeStep)
+            {
+                physics.Step(AllObjects, _physicsTimeStep);
+                foreach (var Object in AllObjects)
+                {
+                    foreach(var component in Object.components)
+                    {
+                        component.FixedUpdate();
+                    }
+                }
+                _accumulator -= _physicsTimeStep;
+            }
             //Raylib.DrawText("Hello, World!", 10, 10, 20, Color.Blue);
             //Raylib.EndDrawing();
             if (RenderObjects != null)
             {
                 renderer.Draw(RenderObjects);   
             }
-            physics.Step(AllObjects, renderer.deltaTime());
             renderer.FrameEnd();
         }
     }

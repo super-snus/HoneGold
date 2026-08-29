@@ -10,9 +10,6 @@ public class Physics : IPhysics
     Vector2 gravity;
     World world;
 
-    public float _physicsTimeStep = 1f / 60f; // 120 FPS
-    public float _accumulator = 0f;
-
     public override void Init()
     {
         //bodyMap = new Dictionary<RigitBody2D, B2Body>();
@@ -85,12 +82,7 @@ public class Physics : IPhysics
                 bodyMap.Add(rigitBody2D, body);
             }
         }
-        _accumulator += deltaTime;
-        while (_accumulator >= _physicsTimeStep)
-        {
-            world.Step(_physicsTimeStep);
-            _accumulator -= _physicsTimeStep;
-        }
+        world.Step(deltaTime);
     }
     private BodyType IntToBodyType(int value)
     {

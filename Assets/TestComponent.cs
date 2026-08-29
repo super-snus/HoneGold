@@ -20,7 +20,6 @@ public class TestComponent : Actor
         } else if (Input.IsKeyPressed(82)) //R
         {
             GameObject.transform.position = new System.Numerics.Vector3(0, 0, 0);
-            System.Console.WriteLine("Reset position");
         }
     }
 }

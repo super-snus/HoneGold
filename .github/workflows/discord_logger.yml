@@ -8,6 +8,7 @@ jobs:
     steps:
       - name: send embed to discord
         run: |
+          # 1. Сбор базовых данных
           AUTHOR="${{ github.actor }}"
           AVATAR="https://github.com{AUTHOR}.png"
           MESSAGE="${{ github.event.head_commit.message }}"
@@ -16,50 +17,55 @@ jobs:
           BRANCH="${{ github.ref_name }}"
           TIMESTAMP="${{ github.event.head_commit.timestamp }}"
           
-          count_added=$(echo '${{ toJson(github.event.head_commit.added) }}' | jq 'length')
-          count_modified=$(echo '${{ toJson(github.event.head_commit.modified) }}' | jq 'length')
-          count_removed=$(echo '${{ toJson(github.event.head_commit.removed) }}' | jq 'length')
+          # 2. Подсчет файлов
+          COUNT_ADDED=$(echo '${{ toJson(github.event.head_commit.added) }}' | jq 'length')
+          COUNT_MODIFIED=$(echo '${{ toJson(github.event.head_commit.modified) }}' | jq 'length')
+          COUNT_REMOVED=$(echo '${{ toJson(github.event.head_commit.removed) }}' | jq 'length')
 
-          title=$(echo "$MESSAGE" | head -n 1 | jq -aR .)
-          desc=$(echo "$MESSAGE" | tail -n +2 | jq -aR .)
+          # 3. Разделение коммита на заголовок и описание
+          TITLE=$(echo "$MESSAGE" | head -n 1)
+          DESC=$(echo "$MESSAGE" | tail -n +2)
 
-          if [ "$desc" != '""' ] && [ ! -z "$desc" ]; then
-            desc_block="description:\n\`\`\`\n\${desc:1:-1}\n\`\`\`\n"
+          if [ ! -z "$DESC" ]; then
+            DESC_BLOCK="description:\n\`\`\`\n${DESC}\n\`\`\`\n"
           else
-            desc_block=""
+            DESC_BLOCK=""
           fi
 
-          stats="**Статистика изменений:**\n🟢 Добавлено: \`$count_added\` файлов | 🟡 Изменено: \`$count_modified\` файлов | 🔴 Удалено: \`$count_removed\` файла"
+          STATS="**Статистика изменений:**\n🟢 Добавлено: \`$COUNT_ADDED\` файлов | 🟡 Изменено: \`$COUNT_MODIFIED\` файлов | 🔴 Удалено: \`$COUNT_REMOVED\` файла"
+          FINAL_DESC="$DESC_BLOCK$STATS"
 
+          # 4. Безопасное формирование JSON через jq (защита от кривых кавычек)
+          jq -n \
+            --arg title "$TITLE" \
+            --arg desc "$FINAL_DESC" \
+            --arg url "$COMMIT_URL" \
+            --arg repo "$REPO" \
+            --arg branch "$BRANCH" \
+            --arg author "$AUTHOR" \
+            --arg avatar "$AVATAR" \
+            --arg ts "$TIMESTAMP" \
+            '{
+              content: null,
+              embeds: [
+                {
+                  title: $title,
+                  description: $desc,
+                  url: $url,
+                  color: 3158064,
+                  fields: [
+                    { name: "repository", value: ("`" + $repo + "`"), inline: true },
+                    { name: "branch", value: ("`" + $branch + "`"), inline: true }
+                  ],
+                  author: { name: $author, icon_url: $avatar },
+                  timestamp: $ts
+                }
+              ],
+              attachments: []
+            }' > discord_payload.json
+
+          # 5. Отправка готового файла в Discord
           curl -H "Content-Type: application/json" \
                -X POST \
-               -d '{
-                 "content": null,
-                 "embeds": [
-                   {
-                     "title": '"$title"',
-                     "description": "'"$desc_block$stats"'",
-                     "url": "'"$COMMIT_URL"'",
-                     "color": 3158064,
-                     "fields": [
-                       {
-                         "name": "repository",
-                         "value": "`'"$REPO"'`",
-                         "inline": true
-                       },
-                       {
-                         "name": "branch",
-                         "value": "`'"$BRANCH"'`",
-                         "inline": true
-                       }
-                     ],
-                     "author": {
-                       "name": "'"$AUTHOR"'",
-                       "icon_url": "'"$AVATAR"'"
-                     },
-                     "timestamp": "'"$TIMESTAMP"'"
-                   }
-                 ],
-                 "attachments": []
-               }' \
+               -d @discord_payload.json \
                ${{ secrets.MALASOLKA_DS_WEBHOOK }}

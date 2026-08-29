@@ -62,4 +62,4 @@ jobs:
                  ],
                  "attachments": []
                }' \
-               ${{ secrets.malasolka_ds_webhook }}
+               ${{ secrets.MALASOLKA_DS_WEBHOOK }}

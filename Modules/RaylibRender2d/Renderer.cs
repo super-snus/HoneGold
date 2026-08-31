@@ -4,12 +4,15 @@ using Silk.NET.Vulkan;
 
 class RayLibRender : IRenderer
 {
+    public int baseWidth = 600;
+    public int baseHeight = 600;
+    
     int PPU = 64;
     public Camera2D camera = new Camera2D();
     public override void FrameStart()
     {
         Raylib.BeginDrawing();
-        Raylib.ClearBackground(Color.DarkBlue);
+        Raylib.ClearBackground(Color.Black);
     }
     public override void FrameEnd()
     {   
@@ -17,7 +20,16 @@ class RayLibRender : IRenderer
     }
     public override void Draw(List<GameObject> gameObjects)
     {
+        Raylib.DrawFPS(10, 10);
         Raylib.BeginMode2D(camera);
+
+        float scaleX = Raylib.GetScreenWidth() / baseWidth;
+        float scaleY = Raylib.GetScreenHeight() / baseHeight;
+
+        // Выбираем минимальный или средний масштаб, чтобы игра не сплющивалась
+        camera.Zoom = MathF.Min(scaleX, scaleY);
+
+        camera.Offset = new System.Numerics.Vector2(Raylib.GetScreenWidth() / 2f, Raylib.GetScreenHeight() / 2f);
         foreach (var gameObject in gameObjects)
         {
             if (gameObject == null) { break; }
@@ -58,7 +70,6 @@ class RayLibRender : IRenderer
             Vector2 origin = new Vector2(width/2, height/2);
             //Raylib.DrawTexture(texture.texture, x, y, Color.White);
             Raylib.DrawTexturePro(texture.texture, source, destination, origin, (gameObject.transform.rotation.Z * (180f / MathF.PI)), Color.White);
-            Raylib.DrawFPS(20, 0);
         }
     }
     public override bool WindowShouldClose()
@@ -70,11 +81,14 @@ class RayLibRender : IRenderer
     {
         Raylib.InitWindow(width, height, title);
 
-        //Raylib.SetTargetFPS(60);
+        baseWidth = width;
+        baseHeight = height;
+
+        Raylib.SetTargetFPS(120);
 
         camera = new Camera2D();
         camera.Target = new System.Numerics.Vector2(0, 0); // На что смотрит камера в мире
-        camera.Offset = new System.Numerics.Vector2(width / 2f, height / 2f); // Центр экрана (0,0 будет посредине)
+        camera.Offset = new System.Numerics.Vector2(Raylib.GetScreenWidth() / 2f, Raylib.GetScreenHeight() / 2f); // Центр экрана (0,0 будет посредине)
         camera.Rotation = 0.0f;
         camera.Zoom = 1.0f; // Можно приближать/отдалять мир
     }

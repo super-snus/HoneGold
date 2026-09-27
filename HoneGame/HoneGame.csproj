@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- HoneGame: код игры. Все cs файлы из папки Assets компилируются в HoneGame.dll. -->
+  <!-- Раннер сам уносит HoneGame.dll в mem_GameData/Modules. Сюда ничего дописывать не надо. -->
+  <!-- Не код (png, wav и т.д.) из Assets раннер сам копирует в mem_GameData/Assets. -->
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../HoneEngine/HoneEngine.csproj" />
+  </ItemGroup>
+
+</Project>

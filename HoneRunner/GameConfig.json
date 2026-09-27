@@ -1,0 +1,14 @@
+{
+    "Name": "Test Game",
+    "Version": "1.0",
+    "Modules": [
+        "HoneModule_RayLib-Render.dll",
+        "HoneModule_Velcro-Physics.dll"
+    ],
+    "Scenes": [
+        {
+            "Name": "SampleScene",
+            "Path": "/mnt/data/HoneEXPEREMENTAL/HoneGame/Assets/test.json"
+        }
+    ]
+}

@@ -1,0 +1,9 @@
+<Project>
+  <!-- Общий файл настроек: применяется КО ВСЕМ проектам решения автоматически.
+       Отдельно в каждый csproj это писать не надо.
+       В Release отключаем pdb файлы (в Debug оставляем, чтобы было удобно жать F5). -->
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,74 @@
+{
+  "Name": "SampleScene",
+  "Objects": [
+    {
+      "ID": "TestObj1",
+      "Name": "TestObj",
+      "Transform": {
+        "Position": { "X": 0.0, "Y": 0.0, "Z": 0.0 },
+        "Rotation": { "X": 0.0, "Y": 0.0, "Z": 0.0 },
+        "Scale": { "X": 1.0, "Y": 1.0, "Z": 1.0 }
+      },
+      "Components": [
+        {
+          "ID": "TestComponent1",
+          "Type": "TestComponent",
+          "Properties": {}
+        },
+        {
+          "ID": "Sprite1",
+          "Type": "Sprite",
+          "Properties": {
+            "texture_patch": "mem.png"
+          }
+        },
+        {
+          "ID": "SpriteRenderer1",
+          "Type": "SpriteRenderer",
+          "Properties": {
+            "sprite":"Sprite1"
+          }
+        },
+        {
+          "ID": "RigitBody2D1",
+          "Type": "RigitBody2D",
+          "Properties": {
+            "mass": 0.0
+          }
+        }
+      ]
+    },
+    {
+      "ID": "blyatforma1",
+      "Name": "blyatforma",
+      "Transform": {
+        "Position": { "X": 0.0, "Y": -3.0, "Z": 0.0 },
+        "Rotation": { "X": 0.0, "Y": 0.0, "Z": 0.0 },
+        "Scale": { "X": 100.0, "Y": 1.0, "Z": 1.0 }
+      },
+      "Components": [
+        {
+          "ID": "RigitBody2D2",
+          "Type": "RigitBody2D",
+          "Properties": {
+            "BodyType": 0
+          }
+        },
+        {
+          "ID": "Sprite2",
+          "Type": "Sprite",
+          "Properties": {
+            "texture_patch": "mem.png"
+          }
+        },
+        {
+           "ID": "SpriteRenderer2",
+          "Type": "SpriteRenderer",
+          "Properties": {
+            "sprite":"Sprite2"
+          }
+        }
+      ]
+    }
+  ]
+}

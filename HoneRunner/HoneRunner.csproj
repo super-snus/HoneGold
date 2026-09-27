@@ -1,0 +1,86 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- HoneRunner: точка входа игры.
+       Разработка: dotnet run из папки HoneRunner (нужен SDK).
+       Релиз другу: dotnet publish HoneRunner (конфиг Release, дотнет другу НЕ нужен).
+       Релиз зашивает движок и весь дотнет внутрь одного файла mem.
+       Отдельно лежат только файлы, которые движок ищет на диске: код игры и модули.
+       Новый модуль: добавь одну строчку в список ниже и одну строчку в GameConfig.json. -->
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>mem</AssemblyName>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <!-- В GameBuild пишет ТОЛЬКО паблиш. Обычный build идет в bin и GameBuild не трогает. -->
+    <PublishDir>../GameBuild/</PublishDir>
+    <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
+  </PropertyGroup>
+
+  <!-- Только для Release: толстый одиночный mem без дотнета у игрока. -->
+  <!-- AdditionalProbingPaths говорит рантайму: ищи DLL (в т.ч. HoneGame.dll)
+       не только рядом с mem, но и в папке Assets. Поэтому оригинальный Program.cs
+       находит TestComponent, а HoneGame.dll при этом лежит в Assets, а не в корне. -->
+
+
+  <ItemGroup>
+    <ProjectReference Include="../HoneEngine/HoneEngine.csproj">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </ProjectReference>
+    <ProjectReference Include="../HoneGame/HoneGame.csproj">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </ProjectReference>
+    <ProjectReference Include="../HoneModule_RayLib-Render/HoneModule_RayLib-Render.csproj">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </ProjectReference>
+    <ProjectReference Include="../HoneModule_Velcro-Physics/HoneModule_Velcro-Physics.csproj">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </ProjectReference>
+  </ItemGroup>
+
+  <!-- Ассеты: все файлы из HoneGame/Assets кроме кода cs. Кинул новый png: сам уедет в Assets. -->
+  <ItemGroup>
+    <GameAssets Include="../HoneGame/Assets/**/*" Exclude="../HoneGame/Assets/**/*.cs" />
+  </ItemGroup>
+
+  <!-- Перед паблишем чистим GameBuild от прошлого мусора.
+       Чистим САМИ, по списку: RemoveDir удалил бы саму папку и уронил бы паблиш. -->
+  <!-- Отключить для диагностики: dotnet publish -p:NoGameData=1 -->
+  <Target Name="CleanGameBuild" BeforeTargets="Publish" Condition="'$(NoGameData)' == ''">
+    <ItemGroup>
+      <OldJunk Include="$(PublishDir)*.dll" />
+      <OldJunk Include="$(PublishDir)*.so" />
+      <OldJunk Include="$(PublishDir)*.pdb" />
+      <OldJunk Include="$(PublishDir)*.json" />
+      <OldJunk Include="$(PublishDir)createdump" />
+      <!-- плюс старые dll внутри mem_GameData (вдруг раньше лежали в другом месте) -->
+      <OldJunk Include="$(PublishDir)mem_GameData\Modules\*.dll" />
+      <OldJunk Include="$(PublishDir)mem_GameData\Assets\HoneGame.dll" />
+    </ItemGroup>
+    <Delete Files="@(OldJunk)" Condition="'@(OldJunk)' != ''" />
+    <MakeDir Directories="$(PublishDir)mem_GameData/Modules" />
+    <MakeDir Directories="$(PublishDir)mem_GameData/Assets" />
+  </Target>
+
+  <!-- После паблиша раскладываем: код игры и модули в Modules, картинки в Assets. -->
+  <!-- В Debug тоже раскладываем (для dotnet run): берем dll из обычной сборки. -->
+  <Target Name="OrganizeGameData" AfterTargets="Publish;Build" Condition="'$(NoGameData)' == ''">
+    <ItemGroup>
+      <BuiltGameCode Include="@(ReferenceCopyLocalPaths)" Condition="'%(Filename)' == 'HoneGame'" />
+      <BuiltModules Include="@(ReferenceCopyLocalPaths)" Condition="$([System.String]::Copy('%(Filename)').StartsWith('HoneModule_'))" />
+    </ItemGroup>
+    <MakeDir Directories="$(TargetDir)mem_GameData/Modules" Condition="'$(Configuration)' == 'Debug'" />
+    <MakeDir Directories="$(TargetDir)mem_GameData/Assets" Condition="'$(Configuration)' == 'Debug'" />
+    <!-- DLL с игрой лежит в Assets (как ты просил). Модули - в Modules. -->
+    <Copy SourceFiles="@(BuiltGameCode)" DestinationFolder="$(PublishDir)mem_GameData/Assets/" Condition="'$(Configuration)' == 'Release' and '@(BuiltGameCode)' != ''" />
+    <Copy SourceFiles="@(BuiltModules)" DestinationFolder="$(PublishDir)mem_GameData/Modules/" Condition="'$(Configuration)' == 'Release' and '@(BuiltModules)' != ''" />
+    <Copy SourceFiles="@(BuiltGameCode)" DestinationFolder="$(TargetDir)mem_GameData/Assets/" Condition="'$(Configuration)' == 'Debug' and '@(BuiltGameCode)' != ''" />
+    <Copy SourceFiles="@(BuiltModules)" DestinationFolder="$(TargetDir)mem_GameData/Modules/" Condition="'$(Configuration)' == 'Debug' and '@(BuiltModules)' != ''" />
+    <Copy SourceFiles="GameConfig.json" DestinationFolder="$(PublishDir)mem_GameData/" SkipUnchangedFiles="true" Condition="'$(Configuration)' == 'Release' and Exists('GameConfig.json')" />
+    <Copy SourceFiles="GameConfig.json" DestinationFolder="$(TargetDir)mem_GameData/" SkipUnchangedFiles="true" Condition="'$(Configuration)' == 'Debug' and Exists('GameConfig.json')" />
+    <Copy SourceFiles="@(GameAssets)" DestinationFiles="@(GameAssets->'$(PublishDir)mem_GameData/Assets/%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" Condition="'$(Configuration)' == 'Release'" />
+    <Copy SourceFiles="@(GameAssets)" DestinationFiles="@(GameAssets->'$(TargetDir)mem_GameData/Assets/%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" Condition="'$(Configuration)' == 'Debug'" />
+  </Target>
+
+</Project>

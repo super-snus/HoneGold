@@ -1,0 +1,9 @@
+<Solution>
+  <Project Path="HoneEngine/HoneEngine.csproj" />
+  <Project Path="HoneGame/HoneGame.csproj" />
+  <Project Path="HoneRunner/HoneRunner.csproj" />
+
+  <!-- модули -->
+  <Project Path="HoneModule_RayLib-Render/HoneModule_RayLib-Render.csproj" />
+  <Project Path="HoneModule_Velcro-Physics/HoneModule_Velcro-Physics.csproj" />
+</Solution>

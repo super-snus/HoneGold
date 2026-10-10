@@ -36,6 +36,7 @@ class RayLibRender : IRenderer
         foreach (var gameObject in gameObjects)
         {   
             SpriteRenderer spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
+            if (spriteRenderer == null) { return; }
             var sprite = spriteRenderer.sprite;
             if (sprite == null) { continue; }
             var texture = sprite.texture;

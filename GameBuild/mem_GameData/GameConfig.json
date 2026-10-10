@@ -8,7 +8,7 @@
     "Scenes": [
         {
             "Name": "SampleScene",
-            "Path": "/mnt/data/HoneEXPEREMENTAL/HoneGame/Assets/test.json"
+            "Path": "/mnt/data/HoneCS/HoneGame/Assets/test.json"
         }
     ]
 }

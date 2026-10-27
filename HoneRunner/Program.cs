@@ -115,7 +115,7 @@ class Program
         // Инициализируем окно через наш динамический RenderModule
         RenderModule?.InitWindow(640, 480, "Hone Engine Test");
         
-        // (Физику и инпут пока оставим закомментированными или подключишь по аналогии)
+        // (Физику и инпут пока оставим закомментированными или подключишь по аналогии) (anthology)
         //IPhysics physics = new PhysicsModule();
         PhysicsModule?.Init();
 

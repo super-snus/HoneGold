@@ -24,9 +24,11 @@ class Program
 
     public static IRenderer RenderModule = null;
     public static IPhysics PhysicsModule = null;
+    public static IInput InputInterface = new IInput();
 
     public static void Main(string[] args)
     {
+        
         // 1. Настраиваем правильные пути (как в Unity: папка mem_GameData)
         string baseDir = AppDomain.CurrentDomain.BaseDirectory;
         string gameDataPath = Path.Combine(baseDir, "mem_GameData");
@@ -34,15 +36,23 @@ class Program
         string assetsPath = Path.Combine(gameDataPath, "Assets");
 
         string _game_patch = Path.Combine(assetsPath, "HoneGame.dll");
+        
+        // 1. Берем текущий контекст приложения (где уже живет HoneEngine)
+        var currentContext = AssemblyLoadContext.Default;
 
-        AssemblyLoadContext.Default.Resolving += (context, assemblyName) =>
-        {
-            if (assemblyName.Name == "HoneGame")
-            {
-                if (File.Exists(_game_patch)) return context.LoadFromAssemblyPath(_game_patch);
-            }
-            return null;
-        };
+        // 2. Вместо LoadFrom загружаем игру в текущий контекст программы
+        Assembly gameAssembly = currentContext.LoadFromAssemblyPath(_game_patch);
+
+        //Assembly game = Assembly.LoadFrom(_game_patch);
+
+        //AssemblyLoadContext.Default.Resolving += (context, assemblyName) =>
+        //{
+        //    if (assemblyName.Name == "HoneGame")
+        //    {
+        //        if (File.Exists(_game_patch)) return context.LoadFromAssemblyPath(_game_patch);
+        //    }
+        //    return null;
+        //};
 
 
         //Type _game_type = _game_assembly.GetTypes();
@@ -96,6 +106,12 @@ class Program
 
                     // 3. Сюда можно добавить еще проверки (IAudio, INetwork и т.д.)
                     // if (typeof(IAudio).IsAssignableFrom(t)) { ... }
+
+                    if (typeof(IInput).IsAssignableFrom(t))
+                    {
+                        InputInterface = (IInput)Activator.CreateInstance(t);
+                        Console.WriteLine($"УСПЕХ: Загружен IInput из класса {t.Name}");
+                    }
                 }
             }
             else
@@ -114,6 +130,10 @@ class Program
 
         // Инициализируем окно через наш динамический RenderModule
         RenderModule?.InitWindow(640, 480, "Hone Engine Test");
+        
+
+        Input.Initialize(InputInterface);
+
         
         // (Физику и инпут пока оставим закомментированными или подключишь по аналогии)
         //IPhysics physics = new PhysicsModule();
@@ -181,7 +201,7 @@ class Program
                 foreach (var obj in scene.Objects)
                 {
                     _render_objects?.Add(obj);
-                    Console.WriteLine(obj.name);
+                    //Console.WriteLine(obj.name);
                 }
             }
             RenderModule?.Draw(_render_objects);

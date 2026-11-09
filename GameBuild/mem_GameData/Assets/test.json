@@ -19,7 +19,6 @@
           "ID": "Sprite1",
           "Type": "Sprite",
           "Properties": {
-            "texture_patch": "mem.png"
           }
         },
         {
@@ -27,6 +26,90 @@
           "Type": "RigitBody2D",
           "Properties": {
             "mass": 0.0
+          }
+        },
+        {
+          "ID": "SpriteRenderer1",
+          "Type": "SpriteRenderer",
+          "Properties": {
+            "sprite": "Sprite1"
+          }
+        }
+      ]
+    },
+
+
+
+    {
+      "ID": "TestObj2",
+      "Name": "TestObj",
+      "Transform": {
+        "Position": { "X": 0.0, "Y": -1.0, "Z": 0.0 },
+        "Rotation": { "X": 0.0, "Y": 0.0, "Z": 0.0 },
+        "Scale": { "X": 50.0, "Y": 1.0, "Z": 1.0 }
+      },
+      "Components": [
+        {
+          "ID": "TestComponent2",
+          "Type": "TestComponent2",
+          "Properties": {}
+        },
+        {
+          "ID": "Sprite2",
+          "Type": "Sprite",
+          "Properties": {
+          }
+        },
+        {
+          "ID": "RigitBody2D2",
+          "Type": "RigitBody2D",
+          "Properties": {
+            "BodyType": 1
+          }
+        },
+        {
+          "ID": "SpriteRenderer2",
+          "Type": "SpriteRenderer",
+          "Properties": {
+            "sprite": "Sprite2"
+          }
+        }
+      ]
+    },
+
+
+    {
+      "ID": "TestObj3",
+      "Name": "TestObj",
+      "Transform": {
+        "Position": { "X": -3.0, "Y": 0.0, "Z": 0.0 },
+        "Rotation": { "X": 0.0, "Y": 0.0, "Z": 0.0 },
+        "Scale": { "X": 1.0, "Y": 1.0, "Z": 1.0 }
+      },
+      "Components": [
+        {
+          "ID": "TestComponent3",
+          "Type": "TestComponent2",
+          "Properties": {}
+        },
+        {
+          "ID": "Sprite3",
+          "Type": "Sprite",
+          "Properties": {
+          }
+        },
+        {
+          "ID": "RigitBody2D3",
+          "Type": "RigitBody2D",
+          "Properties": {
+            "BodyType": 1
+          }
+        },
+        {
+          "ID": "SpriteRenderer3",
+          "Type": "SpriteRenderer",
+          "Properties": {
+            "sprite": "Sprite3"
           }
         }
       ]

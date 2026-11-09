@@ -1,0 +1,82 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
+
+  <PropertyGroup>
+    <!-- Корень решения — там же, где лежит build.proj -->
+    <RootDir>$(MSBuildProjectDirectory)</RootDir>
+    <BuildOutput Condition="'$(BuildOutput)' == ''">$(RootDir)/GameBuild</BuildOutput>
+    <DataDir>$(BuildOutput)/mem_GameData</DataDir>
+    <ModulesDir>$(DataDir)/Modules</ModulesDir>
+    <AssetsDir>$(DataDir)/Assets</AssetsDir>
+    <Configuration Condition="'$(Configuration)' == ''">Release</Configuration>
+    <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == ''">linux-x64</RuntimeIdentifier>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ModuleProject Include="HoneModule_RayLib-Render/HoneModule_RayLib-Render.csproj" />
+    <ModuleProject Include="HoneModule_Velcro-Physics/HoneModule_Velcro-Physics.csproj" />
+    <AssetsDLL Include="HoneGame/bin/Release/net10.0/*.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AssetFile Include="HoneGame/Assets/**/*" Exclude="**/*.cs" />
+    <AssetsDLL Include="HoneGame/bin/Release/net10.0/*.dll" />
+  </ItemGroup>
+
+  <Target Name="Build" DependsOnTargets="Clean;PrepareDirs;RestoreAll;BuildModules;PublishRunner;CopyConfig;CopyAssets;CleanOutput">
+    <Message Text="Сборка завершена. Выход: $(BuildOutput)" Importance="high" />
+  </Target>
+
+  <Target Name="RestoreAll">
+    <MSBuild Projects="@(ModuleProject)" Targets="Restore" />
+    <MSBuild Projects="HoneRunner/HoneRunner.csproj" 
+             Targets="Restore" 
+             Properties="RuntimeIdentifier=$(RuntimeIdentifier)" />
+  </Target>
+
+  <Target Name="Clean">
+    <RemoveDir Directories="$(BuildOutput)" />
+  </Target>
+
+  <Target Name="PrepareDirs">
+    <MakeDir Directories="$(DataDir)/Assets;$(ModulesDir)" />
+  </Target>
+
+  <Target Name="BuildModules">
+    <!-- Собираем модули-плагины как отдельные DLL в mem_GameData/Modules -->
+    <MSBuild Projects="@(ModuleProject)"
+             Targets="Build"
+             Properties="Configuration=$(Configuration);OutDir=$(ModulesDir)/;DebugType=None;DebugSymbols=false" />
+    <!-- Вычищаем служебные файлы, которые модули могли принести с собой.
+         И элементы объявляем здесь (а не на уровне проекта), чтобы маски
+         раскрывались уже после того, как файлы появились на диске. -->
+    <ItemGroup>
+        <ModuleJunk Include="$(ModulesDir)/HoneEngine.dll" />
+        <ModuleJunk Include="$(ModulesDir)/*.deps.json" />
+        <ModuleJunk Include="$(ModulesDir)/*.pdb" />
+    </ItemGroup>
+    <Delete Files="@(ModuleJunk)" ContinueOnError="true" />
+  </Target>
+
+  <Target Name="PublishRunner">
+    <!-- Одиночный исполняемый файл раннера (без ш-скриптов) -->
+    <MSBuild Projects="HoneRunner/HoneRunner.csproj"
+             Targets="Publish"
+             Properties="Configuration=$(Configuration);RuntimeIdentifier=$(RuntimeIdentifier);SelfContained=;PublishSingleFile=true;IncludeNativeLibrariesForSelfExtract=true;EnableCompressionInSingleFile=false;DebugType=None;DebugSymbols=false;PublishDir=$(BuildOutput)/" />
+  </Target>
+
+  <Target Name="CopyConfig">
+    <Copy SourceFiles="HoneRunner/GameConfig.json" DestinationFolder="$(DataDir)" />
+  </Target>
+
+  <Target Name="CopyAssets">
+    <Copy SourceFiles="@(AssetFile)"
+          DestinationFiles="$(AssetsDir)/%(RecursiveDir)%(Filename)%(Extension)" />
+    <Copy SourceFiles="@(AssetsDLL)"
+          DestinationFolder="$(AssetsDir)" />
+  </Target>
+
+  <Target Name="CleanOutput">
+    <Delete Files="$(BuildOutput)/*.pdb;$(BuildOutput)/*.dbg;$(BuildOutput)/*.deps.json" ContinueOnError="true" />
+  </Target>
+
+</Project>

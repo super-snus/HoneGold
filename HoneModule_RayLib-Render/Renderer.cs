@@ -109,3 +109,16 @@ class RayLibRender : IRenderer
         RenderCamera = cameraObject;
     }
 }
+
+class RayLibInput : IInput
+{
+    public override bool IsKeyPressed(int key)
+    {
+        return Raylib.IsKeyPressed((KeyboardKey)key);
+    }
+
+    public override bool IsKeyDown(int key)
+    {
+        return Raylib.IsKeyDown((KeyboardKey)key);
+    }
+}

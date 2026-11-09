@@ -133,6 +133,8 @@ class Program
         
 
         Input.Initialize(InputInterface);
+        
+        Render.Initialize(RenderModule);
 
         
         // (Физику и инпут пока оставим закомментированными или подключишь по аналогии)

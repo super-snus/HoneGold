@@ -1,6 +1,6 @@
 public static class Render
 { 
-    private static IRenderer _provider;
+    public static IRenderer _provider;
 
     public static void Initialize(IRenderer provider)
     {

@@ -22,7 +22,6 @@ class RayLibRender : IRenderer
     public override void Draw(List<GameObject> gameObjects)
     {
         Raylib.DrawFPS(10, 10);
-        Raylib.BeginMode2D(camera);
 
         float scaleX = Raylib.GetScreenWidth() / baseWidth;
         float scaleY = Raylib.GetScreenHeight() / baseHeight;
@@ -31,12 +30,24 @@ class RayLibRender : IRenderer
         camera.Zoom = MathF.Min(scaleX, scaleY);
 
         camera.Offset = new System.Numerics.Vector2(Raylib.GetScreenWidth() / 2f, Raylib.GetScreenHeight() / 2f);
+        if (RenderCamera != null)
+        {
+            camera.Target = new Vector2(-RenderCamera.GameObject.transform.position.X * PPU, -RenderCamera.GameObject.transform.position.Y * PPU);
+        } else
+        {
+            camera.Target = Vector2.Zero;
+        }
 
-        if (gameObjects == null) { return; }
+        Raylib.BeginMode2D(camera);
+
+        if (gameObjects == null) {
+            Raylib.EndMode2D();
+            return;
+        }
         foreach (var gameObject in gameObjects)
         {   
             SpriteRenderer spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
-            if (spriteRenderer == null) { return; }
+            if (spriteRenderer == null) { continue; }
             var sprite = spriteRenderer.sprite;
             if (sprite == null) { continue; }
             var texture = sprite.texture;
@@ -75,8 +86,10 @@ class RayLibRender : IRenderer
             //Raylib.DrawTexture(texture.texture, x, y, Color.White);
             Raylib.DrawTexturePro(texture.texture, source, destination, origin, (gameObject.transform.rotation.Z * (180f / MathF.PI)), Color.White);
 
-            Raylib.BeginMode2D(camera);
+            //Raylib.BeginMode2D(camera);
         }
+
+        Raylib.EndMode2D();
     }
     public override bool WindowShouldClose()
     {

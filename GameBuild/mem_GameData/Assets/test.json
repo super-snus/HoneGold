@@ -2,6 +2,36 @@
   "Name": "SampleScene",
   "Objects": [
     {
+      "ID": "Cameralalka",
+      "Name": "CameraObject",
+      "Transform": {
+        "Position": { "X": 0.0, "Y": 0.0, "Z": 0.0 },
+        "Rotation": { "X": 0.0, "Y": 0.0, "Z": 0.0 },
+        "Scale": { "X": 1.0, "Y": 1.0, "Z": 1.0 }
+      },
+      "Components": [
+        {
+          "ID": "CameraController1",
+          "Type": "CameraController",
+          "Properties": {
+            "target" : "TestObj1",
+            "cam" : "Camera1"
+          }
+        },
+        {
+          "ID": "Camera1",
+          "Type": "Camera",
+          "Properties": {}
+        }
+      ]
+    },
+
+
+
+
+
+
+    {
       "ID": "TestObj1",
       "Name": "TestObj",
       "Transform": {

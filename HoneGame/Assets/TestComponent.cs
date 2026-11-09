@@ -4,6 +4,7 @@ using System.Numerics;
 public class TestComponent : Actor
 {
     private RigitBody2D _rb;
+    //private Camera cam;
     private SpriteRenderer _spriteRenderer;
     private Sprite _sprite;
     private Texture _texture;
@@ -12,9 +13,11 @@ public class TestComponent : Actor
         Console.WriteLine("Test component started");
         _rb = GameObject.GetComponent<RigitBody2D>();
         //Console.WriteLine("Test component started2");
+        
+        //cam = GameObject.GetComponent<Camera>();
+        //Render.SetCamera(cam);
 
-        //тут короче из за того что Scene manager говно я буду делать какашки вручную
-
+        //Console.WriteLine();
 
         _texture = new Texture();
         _texture.Load("mem.png");
@@ -28,12 +31,13 @@ public class TestComponent : Actor
 
         _spriteRenderer = GameObject.GetComponent<SpriteRenderer>();
         //Console.WriteLine("Test component started4");
-        _spriteRenderer.sprite = _sprite; // вот если есть спрайт в спрайтрендерере то оно почему то неработает
+        //_spriteRenderer.sprite = _sprite; // вот если есть спрайт в спрайтрендерере то оно почему то неработает (а щос да)
         //Console.WriteLine("Test component started5!!!!");
     }
 
     public override void Update()
     {
+        
         
         //Console.WriteLine("Test component update");
         if (Input.IsKeyPressed(87)) //W

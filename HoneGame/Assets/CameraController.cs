@@ -8,12 +8,13 @@ public class CameraController : Actor
     {
         Render.SetCamera(cam);
     }
-    public override void Update()
+    public override void FixedUpdate()
     {
         //Console.WriteLine("JJJJJJ");
         //GameObject.transform.position = Vector3.Zero;
         if (target == null) { return; }
 
-        GameObject.transform.position = target.transform.position;
+        //GameObject.transform.position = target.transform.position;
+        GameObject.transform.position = Vector3.Lerp(GameObject.transform.position, target.transform.position, 0.02f);
     }
 }

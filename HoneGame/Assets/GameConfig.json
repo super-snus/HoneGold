@@ -1,5 +1,5 @@
 {
-    "Name": "Test Game",
+    "Name": "testgame",
     "Version": "1.0",
     "Modules": [
         "HoneModule_RayLib-Render.dll",

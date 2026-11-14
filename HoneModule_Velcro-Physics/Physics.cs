@@ -41,7 +41,10 @@ public class Physics : IPhysics
                 }
                 if (gameObject.transform.SizeChanged)
                 {
-                    body.FixtureList.Clear();
+                    for (int i = body.FixtureList.Count - 1; i >= 0; i--)
+                    {
+                        body.DestroyFixture(body.FixtureList[i]);
+                    }
 
                     FixtureFactory.AttachRectangle(gameObject.transform.scale.X, gameObject.transform.scale.Y, 1f, ToPhysics(new Vector2(0f, 0f)), body);
 
@@ -76,7 +79,53 @@ public class Physics : IPhysics
                 body.BodyType = IntToBodyType(rigitBody2D.BodyType); // тип объекта мемного
                 body.Mass = rigitBody2D.mass;
 
+                body.UserData = gameObject;
+
                 FixtureFactory.AttachRectangle(1f, 1f, 1f, ToPhysics(new Vector2(0f, 0f)), body); // создаём хитбокс типа мемемемеме lkz abpbxyjuj rfrfirj
+
+                body.OnCollision += (fixtureA, fixtureB, contact) =>
+                {
+                    GameObject objA = fixtureA.Body.UserData as GameObject;
+                    GameObject objB = fixtureB.Body.UserData as GameObject;
+
+                    if (objA != null && objB != null)
+                    {
+                        if (objA.GetHashCode() < objB.GetHashCode())
+                        {
+                            foreach (var component in objA.components)
+                            {
+                                component.OnCollisionEnter(objB);
+                            }
+
+                            foreach (var component in objB.components)
+                            {
+                                component.OnCollisionEnter(objA);
+                            }
+                        }
+                    }
+                };
+
+                body.OnSeparation += (fixtureA, fixtureB, contact) =>
+                {
+                    GameObject objA = fixtureA.Body.UserData as GameObject;
+                    GameObject objB = fixtureB.Body.UserData as GameObject;
+
+                    if (objA != null && objB != null)
+                    {
+                        if (objA.GetHashCode() < objB.GetHashCode())
+                        {
+                            foreach (var component in objA.components)
+                            {
+                                component.OnCollisionExit(objB);
+                            }
+
+                            foreach (var component in objB.components)
+                            {
+                                component.OnCollisionExit(objA);
+                            }
+                        }
+                    }
+                };
 
                 bodyMap.Add(rigitBody2D, body);
             }

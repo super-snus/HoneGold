@@ -33,7 +33,7 @@
 
     {
       "ID": "TestObj1",
-      "Name": "TestObj",
+      "Name": "Player",
       "Transform": {
         "Position": { "X": 0.0, "Y": 0.0, "Z": 0.0 },
         "Rotation": { "X": 0.0, "Y": 0.0, "Z": 0.0 },
@@ -72,7 +72,7 @@
 
     {
       "ID": "TestObj2",
-      "Name": "TestObj",
+      "Name": "ground",
       "Transform": {
         "Position": { "X": 0.0, "Y": -1.0, "Z": 0.0 },
         "Rotation": { "X": 0.0, "Y": 0.0, "Z": 0.0 },
@@ -110,9 +110,9 @@
 
     {
       "ID": "TestObj3",
-      "Name": "TestObj",
+      "Name": "papa",
       "Transform": {
-        "Position": { "X": -3.0, "Y": 0.0, "Z": 0.0 },
+        "Position": { "X": -3.0, "Y": 0.5, "Z": 0.0 },
         "Rotation": { "X": 0.0, "Y": 0.0, "Z": 0.0 },
         "Scale": { "X": 1.0, "Y": 1.0, "Z": 1.0 }
       },

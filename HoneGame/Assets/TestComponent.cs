@@ -59,4 +59,9 @@ public class TestComponent : Actor
         }
         //Console.WriteLine("Test component update2");
     }
+
+    public override void OnCollisionEnter(GameObject lll)
+    {
+        Console.WriteLine("ааа крутое столкновушка: " + lll.name);
+    }
 }

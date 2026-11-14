@@ -31,34 +31,9 @@ class Program
         
         // 1. Настраиваем правильные пути (как в Unity: папка mem_GameData)
         string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-        string gameDataPath = Path.Combine(baseDir, "mem_GameData");
-        string modulesPath = Path.Combine(gameDataPath, "Modules");
-        string assetsPath = Path.Combine(gameDataPath, "Assets");
+        //string gameDataPath = Path.Combine(baseDir, "mem_GameData");
 
-        string _game_patch = Path.Combine(assetsPath, "HoneGame.dll");
-        
-        // 1. Берем текущий контекст приложения (где уже живет HoneEngine)
-        var currentContext = AssemblyLoadContext.Default;
-
-        // 2. Вместо LoadFrom загружаем игру в текущий контекст программы
-        Assembly gameAssembly = currentContext.LoadFromAssemblyPath(_game_patch);
-
-        //Assembly game = Assembly.LoadFrom(_game_patch);
-
-        //AssemblyLoadContext.Default.Resolving += (context, assemblyName) =>
-        //{
-        //    if (assemblyName.Name == "HoneGame")
-        //    {
-        //        if (File.Exists(_game_patch)) return context.LoadFromAssemblyPath(_game_patch);
-        //    }
-        //    return null;
-        //};
-
-
-        //Type _game_type = _game_assembly.GetTypes();
-
-        // 2. Читаем главный GameConfig.json из папки Modules
-        string gameConfigPath = Path.Combine(gameDataPath, "GameConfig.json");
+        string gameConfigPath = Path.Combine(baseDir, "GameConfig.json");
         
         if (!File.Exists(gameConfigPath))
         {
@@ -68,6 +43,17 @@ class Program
 
         string gameConfigJson = File.ReadAllText(gameConfigPath);
         GameConfig gameConfig = JsonSerializer.Deserialize<GameConfig>(gameConfigJson);
+
+
+        string gameDataPath = Path.Combine(baseDir, gameConfig.Name + "_GameData");
+        string modulesPath = Path.Combine(gameDataPath, "Modules");
+        string assetsPath = Path.Combine(gameDataPath, "Assets");
+
+        string _game_patch = Path.Combine(assetsPath, "HoneGame.dll");
+        
+
+        var currentContext = AssemblyLoadContext.Default;
+        Assembly gameAssembly = currentContext.LoadFromAssemblyPath(_game_patch);
 
         // 3. Грузим модули из списка в конфиге
         foreach (string moduleFileName in gameConfig.Modules)

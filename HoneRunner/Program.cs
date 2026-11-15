@@ -8,13 +8,15 @@ using System.Runtime.Loader;
 using HoneEngine;
 
 // Структура для главного конфига игры
-class GameConfig
+public class GameConfig
 {
     public string Name { get; set; }
     public string Version { get; set; }
+    public string EngineVersion { get; set; }
     public List<string> Modules { get; set; }
     public List<SceneMeta> Scenes { get; set; }
 }
+
 
 class Program
 {
@@ -155,8 +157,9 @@ class Program
 
             foreach (var scene in SceneManager.LoadedScenes)
             {
-                foreach (var obj in scene.Objects)
+                foreach (var obj in SceneManager.ActiveScene.Objects.ToList())
                 {
+                    if (obj.IsDestroyed) continue;
                     foreach (var component in obj.components)
                     {
                         component.Update();

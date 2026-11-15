@@ -6,6 +6,7 @@ public class GameObject
     public List<Actor> components = new List<Actor>();
     public string name { get; set; }
     public string ID { get; set; } = string.Empty;
+    public bool IsDestroyed = false;
     public GameObject(string _name) : this(_name, SceneManager.ActiveScene)
     {
     }

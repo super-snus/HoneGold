@@ -27,6 +27,6 @@ public interface Input
 
     public static int GetCharPressed()
     {
-        return _provider?.GetCharPressed() ?? '0';
+        return _provider?.GetCharPressed() ?? 0;
     }
 }

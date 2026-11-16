@@ -11,7 +11,7 @@ public class RigitBody2D : Actor
 
     public void AddVelocity( Vector2 vec )
     {
-        _pendingVelocityDelta = vec;
+        _pendingVelocityDelta += vec;
     }
 
     public void SetVelocity( Vector2 vec )

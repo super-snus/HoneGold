@@ -19,7 +19,8 @@ public class GameObjectDto
 public class TransformDto
 {
     public Vector3Dto Position { get; set; } = new();
-    public Vector3Dto Rotation { get; set; }
+    //public Vector3Dto Rotation { get; set; }
+    public Vector3Dto Rotation { get; set; } = new();
     public Vector3Dto Scale { get; set; } = new();
 }
 

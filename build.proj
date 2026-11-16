@@ -1,30 +1,24 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
 
   <PropertyGroup>
-    <!-- Корень решения — там же, где лежит build.proj -->
     <RootDir>$(MSBuildProjectDirectory)</RootDir>
     <BuildOutput Condition="'$(BuildOutput)' == ''">$(RootDir)/GameBuild</BuildOutput>
-
 
     <ConfigJson>$([System.IO.File]::ReadAllText('$(RootDir)/HoneGame/Assets/GameConfig.json'))</ConfigJson>
     <GameName>$([System.Text.RegularExpressions.Regex]::Match($(ConfigJson), '(?i)(?&lt;="name"\s*:\s*")[^"]+'))</GameName>
     <DataDir>$(BuildOutput)/$(GameName)_GameData</DataDir>
-    <ExeExt Condition="$(RuntimeIdentifier.StartsWith('win'))">.exe</ExeExt>
 
+    <!-- Определяем .exe по текущей ОС, а не через RuntimeIdentifier -->
+    <ExeExt Condition="$([MSBuild]::IsOSPlatform('Windows'))">.exe</ExeExt>
 
     <ModulesDir>$(DataDir)/Modules</ModulesDir>
     <AssetsDir>$(DataDir)/Assets</AssetsDir>
     <Configuration Condition="'$(Configuration)' == ''">Release</Configuration>
-    <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == ''">linux-x64</RuntimeIdentifier>
   </PropertyGroup>
 
   <ItemGroup>
     <ModuleProject Include="HoneModule_RayLib-Render/HoneModule_RayLib-Render.csproj" />
     <ModuleProject Include="HoneModule_Velcro-Physics/HoneModule_Velcro-Physics.csproj" />
-    <AssetsDLL Include="HoneGame/bin/Release/net10.0/*.dll" />
-  </ItemGroup>
-
-  <ItemGroup>
     <AssetFile Include="HoneGame/Assets/**/*" Exclude="**/*.cs;HoneGame/Assets/GameConfig.json" />
     <AssetsDLL Include="HoneGame/bin/Release/net10.0/*.dll" />
   </ItemGroup>
@@ -34,10 +28,7 @@
   </Target>
 
   <Target Name="RestoreAll">
-    <MSBuild Projects="@(ModuleProject)" Targets="Restore" />
-    <MSBuild Projects="HoneRunner/HoneRunner.csproj" 
-             Targets="Restore" 
-             Properties="RuntimeIdentifier=$(RuntimeIdentifier)" />
+    <MSBuild Projects="@(ModuleProject);HoneRunner/HoneRunner.csproj" Targets="Restore" />
   </Target>
 
   <Target Name="Clean">
@@ -49,13 +40,9 @@
   </Target>
 
   <Target Name="BuildModules">
-    <!-- Собираем модули-плагины как отдельные DLL в mem_GameData/Modules -->
     <MSBuild Projects="@(ModuleProject)"
              Targets="Build"
              Properties="Configuration=$(Configuration);OutDir=$(ModulesDir)/;DebugType=None;DebugSymbols=false" />
-    <!-- Вычищаем служебные файлы, которые модули могли принести с собой.
-         И элементы объявляем здесь (а не на уровне проекта), чтобы маски
-         раскрывались уже после того, как файлы появились на диске. -->
     <ItemGroup>
         <ModuleJunk Include="$(ModulesDir)/HoneEngine.dll" />
         <ModuleJunk Include="$(ModulesDir)/*.deps.json" />
@@ -65,10 +52,10 @@
   </Target>
 
   <Target Name="PublishRunner">
-    <!-- Одиночный исполняемый файл раннера (без ш-скриптов) -->
+    <!-- Собираем без RuntimeIdentifier и PublishSingleFile: использует локальный .NET 10 SDK без скачивания рантаймов -->
     <MSBuild Projects="HoneRunner/HoneRunner.csproj"
-             Targets="Publish"
-             Properties="Configuration=$(Configuration);RuntimeIdentifier=$(RuntimeIdentifier);SelfContained=;PublishSingleFile=true;IncludeNativeLibrariesForSelfExtract=true;EnableCompressionInSingleFile=false;DebugType=None;DebugSymbols=false;PublishDir=$(BuildOutput)/" />
+             Targets="Build"
+             Properties="Configuration=$(Configuration);OutDir=$(BuildOutput)/;DebugType=None;DebugSymbols=false" />
     <Move SourceFiles="$(BuildOutput)/HoneRunner$(ExeExt)" DestinationFiles="$(BuildOutput)/$(GameName)$(ExeExt)" />
   </Target>
 
@@ -84,7 +71,8 @@
   </Target>
 
   <Target Name="CleanOutput">
-    <Delete Files="$(BuildOutput)/*.pdb;$(BuildOutput)/*.dbg;$(BuildOutput)/*.deps.json" ContinueOnError="true" />
+    <!-- Внимание: НЕ удаляй .deps.json в BuildOutput, иначе без SingleFile игра не найдет ссылки на DLL! -->
+    <Delete Files="$(BuildOutput)/*.pdb;$(BuildOutput)/*.dbg" ContinueOnError="true" />
   </Target>
 
 </Project>

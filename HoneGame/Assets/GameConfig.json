@@ -1,7 +1,7 @@
 {
     "Name": "testgame",
     "Version": "1.0",
-    "EngineVersion": "0.0.3",
+    "EngineVersion": "0.0.4",
     "Modules": [
         "HoneModule_RayLib-Render.dll",
         "HoneModule_Velcro-Physics.dll"

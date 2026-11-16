@@ -171,10 +171,23 @@ class Program
             while (_accumulator >= _physicsTimeStep)
             {
                 List<GameObject> _physics_objects = new List<GameObject>();
+                // foreach (var scene in SceneManager.LoadedScenes)
+                // {
+                //     foreach (var obj in scene.Objects)
+                //     {
+                //         _physics_objects.Add(obj);
+                //         foreach (var component in obj.components)
+                //         {
+                //             component.FixedUpdate();
+                //         }
+                //     }
+                // }
+
                 foreach (var scene in SceneManager.LoadedScenes)
                 {
-                    foreach (var obj in scene.Objects)
+                    foreach (var obj in SceneManager.ActiveScene.Objects.ToList())
                     {
+                        if (obj.IsDestroyed) continue;
                         _physics_objects.Add(obj);
                         foreach (var component in obj.components)
                         {

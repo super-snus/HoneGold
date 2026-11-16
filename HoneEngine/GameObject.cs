@@ -34,7 +34,7 @@ public class GameObject
         components.Add(component);
 
         // Сразу запускаем Start()
-        //component.Start();
+        component.Start();
 
         return component;
     }
